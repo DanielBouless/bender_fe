@@ -1,8 +1,13 @@
+import { useContext } from "react";
 import { Text, SafeAreaView, View, Pressable } from "react-native";
+import { CurrentUser } from "../context/CurrentUser";
 import styles from "../styles";
+
+
 
 const HomeScreen = ()=>{
 
+  const {currentUser } = useContext(CurrentUser)
 const skipBtnPressed = ()=>{
     console.log("skip button pressed")
 }
@@ -18,7 +23,7 @@ const requestBtnPressed = () => {
             <Text>Image of Event Goes Here</Text>
           </View>
           <View style={styles.eventDescription}>
-            <Text>description goes here</Text>
+            <Text>{currentUser}</Text>
           </View>
         </View>
         <View style={{ flexDirection: "row" }}>

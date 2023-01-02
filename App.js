@@ -9,11 +9,13 @@ import NavigationBar from './components/NavigationBar';
 import MyEventsScreen from './pages/MyEventsScreen';
 import ChatScreen from './pages/ChatScreen';
 import ProfileScreen from './pages/ProfileScreen';
+import CurrentUserProvider from './context/CurrentUser';
 
 const Stack = createNativeStackNavigator()
 
  const App=()=>{
   return (
+    <CurrentUserProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="signup">
         <Stack.Screen
@@ -49,6 +51,7 @@ const Stack = createNativeStackNavigator()
       </Stack.Navigator>
       <NavigationBar />
     </NavigationContainer>
+    </CurrentUserProvider>
   );
 }
 

@@ -1,13 +1,20 @@
 import { Text, SafeAreaView, Pressable, TextInput, Button, View } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import AsyncStorage  from "@react-native-async-storage/async-storage";
+import React, { useState, useContext, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import axios from 'axios'
 import styles from '../styles'
-
+import { CurrentUser } from '../context/CurrentUser'
 
 const LoginPage = ({ navigation }) => {
-  const name = "name";
-  const [user, setUser] = useState({});
+
+    const { currentUser, setCurrentUser } = useContext(CurrentUser);
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [ credentials, setCredentials ] = useState({
+      email: "",
+      password: "",
+    })
+//Form Config
   const {
     control,
     handleSubmit,
@@ -24,20 +31,40 @@ const LoginPage = ({ navigation }) => {
   register("email");
   register("password");
 
+
+
+  
+  
+  //On login Submit
   const onSubmit = (data) => {
-    setUser(data);
-    // const sendData = async () => {
-    //   await axios.post("http://172.29.128.1:5050/users", data);
-    // };
-    // sendData();
-    console.log(data);
-    if (isDirty) {
-      setValue("email", "");
-      setValue("password", "");
-    }
-    navigation.navigate("home");
-    // navigation.replace('home')
-  };
+    console.log(data)
+    const sendData = async () => {
+      console.log(`Data sent: ${JSON.stringify(data)}`);
+        const response = await fetch("http://172.29.128.1:5050/users/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }); 
+        const userData = await response.json()
+        console.log(`user Data ${userData.user.userId}`);
+        if (response.status === 200) {
+          setCurrentUser(userData.user.userId);
+          AsyncStorage.setItem("token", userData.token);
+          navigation.navigate("home");
+        } else {
+          if (isDirty) {
+            setValue("email", "");
+            setValue("password", "");
+          }
+          navigation.navigate('login')
+        }
+
+        // navigation.replace('home')
+      };
+      sendData();
+}
 
   return (
     <SafeAreaView style={styles.app}>

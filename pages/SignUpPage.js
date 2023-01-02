@@ -1,12 +1,14 @@
 import { Text, SafeAreaView, Pressable, TextInput, Button, View } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import axios from 'axios'
 import styles from "../styles";
+import { CurrentUser } from '../context/CurrentUser';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const SignUpPage = ({navigation})=> {
-
+    const {currentUser, setCurrentUser } = useContext(CurrentUser)
     const name = 'name'
     const [newUser, setNewUser] = useState({})
     const {
@@ -31,11 +33,25 @@ register('password')
 
     const onSubmit = (data)=>{
       setNewUser(data)
+   
         const sendData = async() =>{
-            await axios.post('http://172.29.128.1:5050/users', data)
+            const response = await fetch('http://172.29.128.1:5050/users', {
+              method: 'POST',
+              headers:{
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data)
+            }
+            )
+            const userData = await response.json()
+            console.log(`response: ${userData.user}`)
+            if(response.status ===200){
+              setCurrentUser(userData.user)
+              AsyncStorage.setItem("token", userData.token)
+              navigation.navigate("login");
+            }
         }
-        sendData()
-        console.log(data)       
+        sendData()      
         if(isDirty){
             setValue('firstname','')
             setValue("lastname", "");
@@ -43,7 +59,6 @@ register('password')
             setValue('password','')
         }
         // navigation.replace('login')
-          navigation.navigate("login");
     }
 
 return (
